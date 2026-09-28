@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crumb & Co. — Bakery</title>
+<style>
+:root{--cream:#fffaf3;--ink:#33251f;--muted:#806e64;--brown:#70483a;--rose:#d99b8d;--line:#eadfd6;--white:#fff;--green:#6d8b73;--yellow:#c39145;--red:#b95f5f}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--cream);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer}.top{padding:18px 5%;border-bottom:1px solid var(--line);background:#fff;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}.brand{font-family:Georgia,serif;font-size:25px;font-weight:700}.nav button{border:0;background:none;color:var(--muted);margin-left:14px}.nav button.active{color:var(--brown);font-weight:700}
+.page{max-width:1200px;margin:auto;padding:35px 5%}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:25px;align-items:center}.hero h1{font:700 clamp(42px,6vw,72px) Georgia;margin:0 0 15px}.hero p{color:var(--muted);font-size:18px;line-height:1.6}.btn{border:0;border-radius:13px;padding:13px 18px;background:var(--brown);color:white;font-weight:700}.btn.alt{background:#f1e4db;color:var(--brown)}.cookie-art{height:290px;border-radius:28px;background:linear-gradient(135deg,#ead3c0,#c28d70);position:relative;overflow:hidden}.cookie{width:190px;height:190px;border-radius:50%;background:#b97851;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 20px 45px #70483a55}.chip{width:18px;height:18px;border-radius:50%;background:#583629;position:absolute}
+.section{margin-top:48px}.section h2{font:700 32px Georgia}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 25px #5d39250b}.photo{height:150px;border-radius:15px;background:linear-gradient(135deg,#f1ded0,#d4a48b);margin-bottom:15px;display:grid;place-items:center;font-size:48px}.card h3{margin:8px 0}.muted{color:var(--muted)}.price{font-weight:800;font-size:19px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.qty{display:flex;align-items:center;gap:10px}.qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#fff}.cart{position:fixed;right:22px;bottom:22px;background:var(--brown);color:#fff;border:0;border-radius:18px;padding:15px 20px;box-shadow:0 12px 35px #0003;font-weight:700}.hidden{display:none!important}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:22px}.tabs button{padding:10px 15px;border-radius:11px;border:1px solid var(--line);background:white}.tabs button.active{background:var(--brown);color:#fff}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric strong{display:block;font-size:28px;margin-top:8px}.status{display:inline-block;padding:6px 9px;border-radius:99px;font-size:12px;font-weight:800;background:#eee}.new{background:#f5e2d7;color:#8a4f37}.confirmed{background:#eee6d5;color:#7d622f}.baking{background:#e5edf0;color:#526e7a}.ready{background:#e0eee4;color:#4d7256}.completed{background:#e9e9e9;color:#666}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:14px 8px;border-bottom:1px solid var(--line);vertical-align:middle}th{color:var(--muted);font-size:13px}.admin-grid{display:grid;grid-template-columns:1.5fr .9fr;gap:18px}.form{display:grid;gap:12px}.form input,.form select{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff}.switch{display:flex;align-items:center;gap:8px}.notice{padding:13px 15px;border-radius:12px;background:#f7eee8;color:#765a4b;margin:15px 0}
+footer{padding:45px 5%;text-align:center;color:var(--muted);border-top:1px solid var(--line);margin-top:55px}
+@media(max-width:800px){.hero,.admin-grid{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr 1fr}table{font-size:13px}.hide-mobile{display:none}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.top{align-items:flex-start}.nav button{margin-left:5px}.page{padding-top:25px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Crumb & Co.</div>
+  <nav class="nav">
+    <button id="shopNav" class="active" onclick="showShop()">Shop</button>
+    <button id="loginNav" onclick="openLogin()">Log in</button>
+  </nav>
+</header>
+
+<main id="shop" class="page">
+  <section class="hero">
+    <div>
+      <p class="muted">SMALL-BATCH • BAKED TO ORDER</p>
+      <h1>Cookies worth coming back for.</h1>
+      <p>Build your box from the menu below, choose a pickup time, and review your order before checkout.</p>
+      <button class="btn" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Shop cookies</button>
+    </div>
+    <div class="cookie-art"><div class="cookie" id="cookieArt"></div></div>
+  </section>
+
+  <section id="menu" class="section">
+    <div class="row"><div><p class="muted">THE MENU</p><h2>Choose your cookies</h2></div></div>
+    <div id="productGrid" class="grid"></div>
+  </section>
+
+  <section class="section panel">
+    <h2>Pickup scheduling</h2>
+    <div class="form">
+      <label>Pickup date <select id="pickupDate"></select></label>
+      <label>Pickup window
+        <select id="pickupTime"></select>
+      </label>
+    </div>
+    <div class="notice">Pickup is available only on the dates and time windows shown above.</div>
+    <div class="notice">Demo checkout: orders are stored only in this browser. Connect Stripe/Shopify/Wix before accepting real payments.</div>
+  </section>
+</main>
+
+<main id="login" class="page hidden">
+  <div class="panel" style="max-width:480px;margin:40px auto">
+    <p class="muted">ACCOUNT</p><h1 style="font:700 42px Georgia;margin-top:0">Log in</h1>
+    <p class="muted">Customers and the owner use the same login. After secure authentication, the account role determines which page opens.</p>
+    <div class="form"><input id="loginEmail" type="email" placeholder="Email"><input id="loginPassword" type="password" placeholder="Password"><button class="btn" onclick="signIn()">Log in</button></div>
+    <div class="notice">Secure authentication is not connected in this static GitHub Pages preview. The published version should use an authentication provider and a server-side/database role so the owner role cannot be changed in browser code.</div>
+    <p class="muted" style="margin-bottom:0">New customer? <button style="border:0;background:none;color:var(--brown);font-weight:700;padding:0" onclick="openCreateAccount()">Create an account</button></p>
+  </div>
+</main>
+
+<main id="createAccount" class="page hidden">
+  <div class="panel" style="max-width:480px;margin:40px auto">
+    <p class="muted">NEW CUSTOMER</p><h1 style="font:700 42px Georgia;margin-top:0">Create account</h1>
+    <div class="form"><input id="newCustomerName" placeholder="Name"><input id="newCustomerEmail" type="email" placeholder="Email"><input id="newCustomerPassword" type="password" placeholder="Password"><button class="btn" onclick="createCustomerAccount()">Create account</button><button class="btn alt" onclick="openLogin()">Back to login</button></div>
+    <div class="notice">Account creation will become active when secure authentication is connected.</div>
+  </div>
+</main>
+
+<main id="customerAccount" class="page hidden">
+ <div class="row"><div><p class="muted">MY ACCOUNT</p><h1 style="font:700 42px Georgia;margin:0">Welcome back</h1></div><div><button class="btn alt" onclick="showShop()">Shop</button> <button class="btn alt" onclick="logout()">Log out</button></div></div>
+ <section class="section panel"><h2>Customer account</h2><p class="muted">This area can show the customer's order history, saved contact details, and upcoming pickups after the site is connected to a backend.</p></section>
+</main>
+
+<main id="admin" class="page hidden">
+ <div class="row"><div><p class="muted">OWNER AREA</p><h1 style="font:700 42px Georgia;margin:0">Owner dashboard</h1></div><div><button class="btn alt" onclick="showShop()">View storefront</button> <button class="btn alt" onclick="ownerLogout()">Log out</button></div></div>
+ <div class="tabs" style="margin-top:24px"><button class="active">Pickup settings</button></div>
+ <section class="admin-grid">
+  <div class="panel"><h2>Pickup days</h2><p class="muted">Choose the weekdays customers can select.</p><div class="form" id="daySettings"></div></div>
+  <div class="panel"><h2>Pickup windows</h2><p class="muted">One time window per line.</p><textarea id="windowSettings" style="width:100%;min-height:190px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit"></textarea><button class="btn" style="margin-top:12px" onclick="savePickupSettings()">Save pickup settings</button><div class="notice">In this static preview, settings are saved only in this browser. A backend is needed for changes to update every customer's device.</div></div>
+ </section>
+</main>
+
+<div id="cartBar" class="cart" onclick="openCart()">Cart · <span id="cartCount">0</span> · <span id="cartTotal">$0.00</span></div>
+
+<footer>Crumb & Co. · Small-batch cookies</footer>
+
+<script>
+const defaultProducts=[
+{id:1,name:"Classic Chocolate Chip",price:3.50,emoji:"🍪",stock:24,active:true},
+{id:2,name:"Brown Butter Sea Salt",price:4.00,emoji:"🧈",stock:18,active:true},
+{id:3,name:"Cookies & Cream",price:4.00,emoji:"🤍",stock:16,active:true},
+{id:4,name:"Double Chocolate",price:4.25,emoji:"🍫",stock:12,active:true},
+{id:5,name:"Strawberry White Chocolate",price:4.25,emoji:"🍓",stock:10,active:true},
+{id:6,name:"Birthday Cake",price:3.75,emoji:"🎂",stock:14,active:true}
+];
+let products=JSON.parse(localStorage.getItem("cc_products")||"null")||defaultProducts;
+let cart=JSON.parse(localStorage.getItem("cc_cart")||"{}");
+let orders=JSON.parse(localStorage.getItem("cc_orders")||"[]");
+
+function money(n){return "$"+Number(n).toFixed(2)}
+function save(){localStorage.setItem("cc_products",JSON.stringify(products));localStorage.setItem("cc_cart",JSON.stringify(cart));localStorage.setItem("cc_orders",JSON.stringify(orders))}
+function renderShop(){
+ const grid=document.getElementById("productGrid"); grid.innerHTML="";
+ products.filter(p=>p.active).forEach(p=>{
+  const div=document.createElement("div");div.className="card";
+  div.innerHTML=`<div class="photo">${p.emoji}</div><div class="row"><h3>${p.name}</h3><span class="price">${money(p.price)}</span></div><p class="muted">${p.stock>0?p.stock+" available":"Sold out"}</p><button class="btn" ${p.stock<=0?"disabled":""} onclick="addToCart(${p.id})">${p.stock>0?"Add to box":"Sold out"}</button>`;
+  grid.appendChild(div)
+ })
+}
+function addToCart(id){let p=products.find(x=>x.id===id);if(!p||p.stock<=0)return;cart[id]=(cart[id]||0)+1;save();renderCart()}
+function renderCart(){let count=Object.values(cart).reduce((a,b)=>a+b,0);let total=Object.entries(cart).reduce((s,[id,q])=>s+(products.find(p=>p.id==id)?.price||0)*q,0);document.getElementById("cartCount").textContent=count;document.getElementById("cartTotal").textContent=money(total)}
+function openCart(){
+ if(!Object.keys(cart).length){alert("Your cart is empty.");return}
+ let lines=Object.entries(cart).map(([id,q])=>{let p=products.find(x=>x.id==id);return `${q} × ${p.name} — ${money(p.price*q)}`}).join("\\n");
+ let name=prompt("Enter the customer name for this demo order:"); if(!name)return;
+ let date=document.getElementById("pickupDate").value||"No date selected";let time=document.getElementById("pickupTime").value;
+ let total=Object.entries(cart).reduce((s,[id,q])=>s+products.find(p=>p.id==id).price*q,0);
+ let order={id:1040+orders.length+1,name,items:Object.entries(cart).map(([id,q])=>({id:Number(id),qty:q})),total,date,time,status:"New",created:new Date().toISOString()};
+ orders.unshift(order);
+ Object.entries(cart).forEach(([id,q])=>{let p=products.find(x=>x.id==id);p.stock=Math.max(0,p.stock-q)});
+ cart={};save();renderShop();renderCart();
+ alert(`Order #${order.id} created!\\n\\n${lines}\\n\\nPickup: ${date}, ${time}\\nTotal: ${money(total)}\\n\\nThis is a demo order — no payment was collected.`);
+}
+// PUBLIC PICKUP SETTINGS
+// 0=Sunday, 1=Monday, ... 5=Friday, 6=Saturday.
+// These defaults can later be loaded from a secure owner dashboard/backend.
+let pickupSettings=JSON.parse(localStorage.getItem("cc_pickupSettings")||"null")||{
+  allowedDays:[5,6],
+  windows:["3:00–3:30 PM","3:30–4:00 PM","4:00–4:30 PM","4:30–5:00 PM","5:00–5:30 PM"],
+  daysAhead:60
+};
+function formatPickupDate(d){return d.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}
+function renderPickupOptions(){
+ const dateSelect=document.getElementById("pickupDate");
+ const timeSelect=document.getElementById("pickupTime");
+ dateSelect.innerHTML=""; timeSelect.innerHTML="";
+ const today=new Date();today.setHours(12,0,0,0);
+ for(let i=0;i<=pickupSettings.daysAhead;i++){
+   const d=new Date(today);d.setDate(today.getDate()+i);
+   if(pickupSettings.allowedDays.includes(d.getDay())){
+     const option=document.createElement("option");
+     option.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+     option.textContent=formatPickupDate(d);dateSelect.appendChild(option);
+   }
+ }
+ pickupSettings.windows.forEach(w=>{const option=document.createElement("option");option.value=w;option.textContent=w;timeSelect.appendChild(option)});
+}
+
+const dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function hideAllPages(){["shop","login","createAccount","customerAccount","admin"].forEach(id=>document.getElementById(id).classList.add("hidden"));document.getElementById("cartBar").classList.add("hidden")}
+function showShop(){hideAllPages();document.getElementById("shop").classList.remove("hidden");document.getElementById("cartBar").classList.remove("hidden");document.getElementById("shopNav").classList.add("active");document.getElementById("loginNav").classList.remove("active")}
+function openLogin(){hideAllPages();document.getElementById("login").classList.remove("hidden");document.getElementById("shopNav").classList.remove("active");document.getElementById("loginNav").classList.add("active")}
+function openCreateAccount(){hideAllPages();document.getElementById("createAccount").classList.remove("hidden")}
+function signIn(){alert("Secure authentication is not connected yet. Once connected, this same login will automatically route owner accounts to the Owner Dashboard and customer accounts to My Account.")}
+function createCustomerAccount(){alert("Secure account creation is not connected yet.")}
+function showCustomerAccount(){hideAllPages();document.getElementById("customerAccount").classList.remove("hidden")}
+function showOwnerDashboard(){hideAllPages();document.getElementById("admin").classList.remove("hidden");renderOwnerSettings()}
+function logout(){showShop()}
+function ownerLogout(){logout()}
+function renderOwnerSettings(){
+ const el=document.getElementById("daySettings");el.innerHTML=dayNames.map((name,i)=>`<label class="switch"><input type="checkbox" data-day="${i}" ${pickupSettings.allowedDays.includes(i)?"checked":""}> ${name}</label>`).join("");
+ document.getElementById("windowSettings").value=pickupSettings.windows.join("\n");
+}
+function savePickupSettings(){
+ const days=[...document.querySelectorAll("#daySettings input:checked")].map(x=>Number(x.dataset.day));
+ const windows=document.getElementById("windowSettings").value.split("\n").map(x=>x.trim()).filter(Boolean);
+ if(!days.length||!windows.length)return alert("Select at least one pickup day and add at least one pickup window.");
+ pickupSettings.allowedDays=days;pickupSettings.windows=windows;localStorage.setItem("cc_pickupSettings",JSON.stringify(pickupSettings));renderPickupOptions();alert("Pickup settings saved for this browser preview.");
+}
+
+renderPickupOptions();
+renderShop();renderCart();
+</script>
+</body></html>
